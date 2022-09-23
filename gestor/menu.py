@@ -67,4 +67,4 @@ def iniciar():
             print("Saliendo...\n")
             break
 
-        input("\nPresiona ENTER para continuar...")
+input("\nPresiona ENTER para continuar...")
