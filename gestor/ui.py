@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import database as db
 from tkinter.messagebox import askokcancel, WARNING
-
+import helpers
 
 class CenterWidgetMixin:
     def center(self):
@@ -70,6 +70,9 @@ class MainWindow(Tk, CenterWidgetMixin):
                 self.treeview.delete(cliente)
                 db.Clientes.borrar(campos[0])
 
+    def create(self):
+        CreateClientWindow(self)
+
 class CreateClientWindow(Toplevel, CenterWidgetMixin):
     def __init__(self, parent):
         super().__init__(parent)
@@ -104,3 +107,29 @@ class CreateClientWindow(Toplevel, CenterWidgetMixin):
         crear.configure(state=DISABLED)
         crear.grid(row=0, column=0)
         Button(frame, text="Cancelar", command=self.close).grid(row=0, column=1)
+
+        self.validaciones = [0, 0, 0]
+        self.crear = crear
+        self.dni = dni
+        self.nombre = nombre
+        self.apellido = apellido
+
+    def validate(self, event, index):
+        valor = event.widget.get()
+        valido = helpers.dni_valido(valor, db.Clientes.lista) if index == 0 \
+            else (valor.isalpha() and len(valor) >= 2 and len(valor) <= 30)
+        event.widget.configure({"bg": "Green" if valido else "Red"})
+        # Cambiar el estado del botón en base a las validaciones
+        self.validaciones[index] = valido
+        self.crear.config(state=NORMAL if self.validaciones == [1, 1, 1] else DISABLED)
+
+    def create_client(self):
+        self.master.treeview.insert(
+            parent='', index='end', iid=self.dni.get(),
+            values=(self.dni.get(), self.nombre.get(), self.apellido.get()))
+        db.Clientes.crear(self.dni.get(), self.nombre.get(), self.apellido.get())
+        self.close()
+
+    def close(self):
+        self.destroy()
+        self.update()
