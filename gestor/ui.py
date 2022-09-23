@@ -26,6 +26,13 @@ class CreateClientWindow(Toplevel, CenterWidgetMixin):
         self.transient(parent)
         self.grab_set()
 
+    def create_client(self):
+        self.master.treeview.insert(
+            parent='', index='end', iid=self.dni.get(),
+            values=(self.dni.get(), self.nombre.get(), self.apellido.get()))
+        db.Clientes.crear(self.dni.get(), self.nombre.get(), self.apellido.get())
+        self.close()
+
     def build(self):
         frame = Frame(self)
         frame.pack(padx=20, pady=10)
@@ -57,13 +64,6 @@ class CreateClientWindow(Toplevel, CenterWidgetMixin):
         self.dni = dni
         self.nombre = nombre
         self.apellido = apellido
-
-    def create_client(self):
-        self.master.treeview.insert(
-            parent='', index='end', iid=self.dni.get(),
-            values=(self.dni.get(), self.nombre.get(), self.apellido.get()))
-        db.Clientes.crear(self.dni.get(), self.nombre.get(), self.apellido.get())
-        self.close()
 
     def close(self):
         self.destroy()
